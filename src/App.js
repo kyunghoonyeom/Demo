@@ -10,6 +10,15 @@ export default function App() {
   const hands = new Hands();
   const webcamRef = useRef(null);
   console.log(hands);
+  useEffect(() => {
+    navigator.getUserMedia(
+      { audio: true, video: true },
+      (stream) => {
+        stream.getTracks().forEach((x) => x.stop());
+      },
+      (err) => console.log(err)
+    );
+  }, []);
   return (
     <div className="App">
       React Webcam
