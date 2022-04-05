@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@mediapipe/camera_utils": "^0.3.1640029074",
+    "@mediapipe/drawing_utils": "^0.3.1620248257",
     "@mediapipe/hands": "^0.4.1646424915",
     "@testing-library/jest-dom": "^5.16.3",
     "@testing-library/react": "^12.1.4",
