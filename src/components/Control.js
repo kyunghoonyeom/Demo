@@ -6,6 +6,9 @@ export default function Control({
   setIndex,
   progress,
   setProgress,
+  start,
+  stop,
+  download,
 }) {
   const handleClick = () => {
     const randomIndex = Math.floor(Math.random() * data.words.length);
@@ -21,6 +24,9 @@ export default function Control({
   return (
     <div>
       <button onClick={handleClick}>Go</button>
+      <button onClick={start}>Start</button>
+      <button onClick={stop}>Stop</button>
+      <button onClick={download}>Download</button>
     </div>
   );
 }
