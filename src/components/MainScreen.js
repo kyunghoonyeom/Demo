@@ -1,8 +1,8 @@
 import * as Hands from "@mediapipe/hands";
 import * as Camera from "@mediapipe/camera_utils";
 import Webcam from "react-webcam";
-import { useRecordWebcam, RecordWebcam } from "react-record-webcam";
-import { useRef, useEffect } from "react";
+import { useRecordWebcam, CAMERA_STATUS } from "react-record-webcam";
+import { useState, useRef, useEffect } from "react";
 import { drawConnectors, drawLandmarks } from "@mediapipe/drawing_utils";
 import Control from "./Control";
 
@@ -12,17 +12,14 @@ export default function MainScreen({
   setIndex,
   progress,
   setProgress,
+  word,
 }) {
+  const [landmark, setLandmark] = useState([]);
   const handRef = useRef(null);
-  const webcamRef = useRef(null);
   const canvasRef = useRef(null);
   const recordWebcam = useRecordWebcam();
-  // if (recordWebcam) {
-  //   setRecord({ start: recordWebcam.start });
-  // }
-  const onResults = (results) => {
-    // const videoWidth = webcamRef.current.video.videoWidth;
-    // const videoHeight = webcamRef.current.video.videoHeight;
+
+  const processResult = (results, save) => {
     const videoWidth = recordWebcam.webcamRef.current.video.videoWidth;
     const videoHeight = recordWebcam.webcamRef.current.video.videoHeight;
 
@@ -40,6 +37,9 @@ export default function MainScreen({
       canvasElement.height
     );
     if (results.multiHandLandmarks) {
+      if (save) {
+        setLandmark((arr) => [...arr, results.multiHandLandmarks]);
+      }
       for (const landmarks of results.multiHandLandmarks) {
         drawConnectors(canvasCtx, landmarks, Hands.HAND_CONNECTIONS, {
           color: "#00FF00",
@@ -49,6 +49,13 @@ export default function MainScreen({
       }
     }
     canvasCtx.restore();
+  };
+  const onResults = (results) => {
+    processResult(results, false);
+  };
+
+  const onResultSave = (results) => {
+    processResult(results, true);
   };
   const init_hands = () => {
     const hands = new Hands.Hands({
@@ -67,10 +74,7 @@ export default function MainScreen({
     if (
       typeof recordWebcam.webcamRef.current !== "undefined" &&
       recordWebcam.webcamRef.current !== null
-      // typeof webcamRef.current !== "undefined" &&
-      // webcamRef.current !== null
     ) {
-      // webcamRef.current.crossOrigin = "anonymous";
       recordWebcam.webcamRef.current.crossOrigin = "anonymous";
       const camera = new Camera.Camera(recordWebcam.webcamRef.current.video, {
         onFrame: async () => {
@@ -83,15 +87,11 @@ export default function MainScreen({
     }
   };
 
+  // Component did mount
   useEffect(() => {
-    // if (recordWebcam) {
-    //   if (recordWebcam.status === "CLOSED") {
     recordWebcam.open();
     init_hands();
-    //   } else if (recordWebcam.status === "OPEN") {
-    //     init_hands();
-    //   }
-    // }
+
     navigator.getUserMedia(
       { audio: true, video: true },
       (stream) => {
@@ -101,30 +101,40 @@ export default function MainScreen({
     );
   }, []);
 
+  // Component update
+  useEffect(() => {
+    handRef.current.onResults(
+      recordWebcam.status === CAMERA_STATUS.RECORDING ? onResultSave : onResults
+    );
+  }, [recordWebcam.status]);
+
   return (
     <div>
-      <p>Camera Status: {recordWebcam.status}</p>
-      {/* <video ref={recordWebcam.webcamRef} autoPlay muted /> */}
       <Webcam ref={recordWebcam.webcamRef} hidden />
-      <video ref={recordWebcam.previewRef} muted />
-      {/* <Webcam ref={webcamRef} hidden /> */}
-      {/* {recordWebcam.status === "INIT" && <canvas ref={canvasRef} />} */}
-      {recordWebcam.status === "OPEN" && <canvas ref={canvasRef} />}
-      <button onClick={init_hands}>init hands</button>
-      <button onClick={recordWebcam.open}>open</button>
-      <button onClick={recordWebcam.start}>start</button>
-      <button onClick={recordWebcam.stop}>stop</button>
-      <button onClick={recordWebcam.download}>download</button>
-      {/* <Control
+      <video
+        ref={recordWebcam.previewRef}
+        muted
+        controls
+        hidden={recordWebcam.status !== CAMERA_STATUS.PREVIEW}
+      />
+      <canvas
+        ref={canvasRef}
+        hidden={
+          recordWebcam.status !== CAMERA_STATUS.OPEN &&
+          recordWebcam.status !== CAMERA_STATUS.RECORDING
+        }
+      />
+      <Control
         setIndex={setIndex}
         progress={progress}
         setProgress={setProgress}
         level={level}
         setLevel={setLevel}
-        start={recordWebcam.start}
-        stop={recordWebcam.stop}
-        download={recordWebcam.download}
-      /> */}
+        setLandmark={setLandmark}
+        landmark={landmark}
+        word={word}
+        recordWebcam={recordWebcam}
+      />
     </div>
   );
 }

@@ -1,7 +1,5 @@
-import { useRef, useState, useEffect } from "react";
+import { useState } from "react";
 import "./App.css";
-import { useRecordWebcam } from "react-record-webcam";
-import Control from "./components/Control";
 import MainScreen from "./components/MainScreen";
 import Prompt from "./components/Prompt";
 
@@ -10,7 +8,6 @@ export default function App() {
   const [index, setIndex] = useState(0);
   const [progress, setProgress] = useState(0);
   const [level, setLevel] = useState(1);
-  const [record, setRecord] = useState();
 
   return (
     <div className="App">
@@ -21,6 +18,7 @@ export default function App() {
         index={index}
       />
       <MainScreen
+        word={word}
         setIndex={setIndex}
         progress={progress}
         setProgress={setProgress}
