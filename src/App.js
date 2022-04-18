@@ -7,16 +7,11 @@ export default function App() {
   const [word, setWord] = useState("");
   const [index, setIndex] = useState(0);
   const [progress, setProgress] = useState(0);
-  const [level, setLevel] = useState(1);
+  const [level, setLevel] = useState(5);
 
   return (
     <div className="App">
-      <Prompt
-        level={level}
-        progress={progress}
-        setWord={setWord}
-        index={index}
-      />
+      <div>
       <MainScreen
         word={word}
         setIndex={setIndex}
@@ -24,7 +19,11 @@ export default function App() {
         setProgress={setProgress}
         level={level}
         setLevel={setLevel}
+        setWord={setWord}
+        index={index}
       />
+      </div>
+
     </div>
   );
 }

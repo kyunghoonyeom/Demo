@@ -5,6 +5,7 @@ import { useRecordWebcam, CAMERA_STATUS } from "react-record-webcam";
 import { useState, useRef, useEffect } from "react";
 import { drawConnectors, drawLandmarks } from "@mediapipe/drawing_utils";
 import Control from "./Control";
+import data from "../assets/wordsToSign.json";
 
 export default function MainScreen({
   level,
@@ -13,7 +14,15 @@ export default function MainScreen({
   progress,
   setProgress,
   word,
+  setWord,
+  index
 }) {
+  const wordList = data.words;
+  let myString = wordList[index]
+  myString.replace(/^\w/, (c) => c.toUpperCase());
+  setWord(myString);
+
+
   const [landmark, setLandmark] = useState([]);
   const handRef = useRef(null);
   const canvasRef = useRef(null);
@@ -80,8 +89,8 @@ export default function MainScreen({
         onFrame: async () => {
           await hands.send({ image: recordWebcam.webcamRef.current.video });
         },
-        width: 1280,
-        height: 720,
+        width: 640,
+        height: 480,
       });
       camera.start();
     }
@@ -109,7 +118,7 @@ export default function MainScreen({
   }, [recordWebcam.status]);
 
   return (
-    <div>
+    <div className='rowC'>
       <Webcam ref={recordWebcam.webcamRef} hidden />
       <video
         ref={recordWebcam.previewRef}
@@ -117,13 +126,22 @@ export default function MainScreen({
         controls
         hidden={recordWebcam.status !== CAMERA_STATUS.PREVIEW}
       />
-      <canvas
-        ref={canvasRef}
-        hidden={
-          recordWebcam.status !== CAMERA_STATUS.OPEN &&
-          recordWebcam.status !== CAMERA_STATUS.RECORDING
-        }
-      />
+      <div id="canvas-wrap">
+        <canvas
+          ref={canvasRef}
+          hidden={
+            recordWebcam.status !== CAMERA_STATUS.OPEN &&
+            recordWebcam.status !== CAMERA_STATUS.RECORDING
+          }
+        />
+        <div class="circle" style={{display: (recordWebcam.status === CAMERA_STATUS.RECORDING)?'block':'none'}}>
+        </div>
+      </div>
+
+      <div className="colC">
+
+      <h1 >{wordList[index]}</h1>
+      <h2>{progress}/{level*2} words signed</h2>
       <Control
         setIndex={setIndex}
         progress={progress}
@@ -135,6 +153,8 @@ export default function MainScreen({
         word={word}
         recordWebcam={recordWebcam}
       />
+    </div>
+
     </div>
   );
 }
