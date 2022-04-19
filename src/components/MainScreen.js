@@ -94,7 +94,7 @@ export default function MainScreen({
     recordWebcam.open();
     init_hands();
 
-    navigator.getUserMedia(
+    navigator.mediaDevices.getUserMedia(
       { audio: true, video: true },
       (stream) => {
         stream.getTracks().forEach((x) => x.stop());
