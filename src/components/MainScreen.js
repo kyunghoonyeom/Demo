@@ -5,7 +5,7 @@ import { useRecordWebcam, CAMERA_STATUS } from "react-record-webcam";
 import { useState, useRef, useEffect } from "react";
 import { drawConnectors, drawLandmarks } from "@mediapipe/drawing_utils";
 import Control from "./Control";
-import data from "../assets/wordsToSign.json";
+import "./MainScreen.css";
 
 export default function MainScreen({
   level,
@@ -14,15 +14,7 @@ export default function MainScreen({
   progress,
   setProgress,
   word,
-  setWord,
-  index
 }) {
-  const wordList = data.words;
-  let myString = wordList[index]
-  myString.replace(/^\w/, (c) => c.toUpperCase());
-  setWord(myString);
-
-
   const [landmark, setLandmark] = useState([]);
   const handRef = useRef(null);
   const canvasRef = useRef(null);
@@ -31,7 +23,6 @@ export default function MainScreen({
   const processResult = (results, save) => {
     const videoWidth = recordWebcam.webcamRef.current.video.videoWidth;
     const videoHeight = recordWebcam.webcamRef.current.video.videoHeight;
-
     canvasRef.current.width = videoWidth;
     canvasRef.current.height = videoHeight;
     const canvasElement = canvasRef.current;
@@ -85,12 +76,14 @@ export default function MainScreen({
       recordWebcam.webcamRef.current !== null
     ) {
       recordWebcam.webcamRef.current.crossOrigin = "anonymous";
+
+      console.log(recordWebcam.webcamRef.current);
       const camera = new Camera.Camera(recordWebcam.webcamRef.current.video, {
         onFrame: async () => {
           await hands.send({ image: recordWebcam.webcamRef.current.video });
         },
-        width: 640,
-        height: 480,
+        width: 1280,
+        height: 720,
       });
       camera.start();
     }
@@ -118,30 +111,35 @@ export default function MainScreen({
   }, [recordWebcam.status]);
 
   return (
-    <div className='rowC'>
-      <Webcam ref={recordWebcam.webcamRef} hidden />
-      <video
-        ref={recordWebcam.previewRef}
-        muted
-        controls
-        hidden={recordWebcam.status !== CAMERA_STATUS.PREVIEW}
-      />
-      <div id="canvas-wrap">
-        <canvas
-          ref={canvasRef}
+    <div className="container">
+      <div className="screen-wrapper">
+        <Webcam ref={recordWebcam.webcamRef} hidden />
+        <video
+          ref={recordWebcam.previewRef}
+          muted
+          controls
+          hidden={recordWebcam.status !== CAMERA_STATUS.PREVIEW}
+        />
+        <div
+          className="canvas-cta"
           hidden={
             recordWebcam.status !== CAMERA_STATUS.OPEN &&
             recordWebcam.status !== CAMERA_STATUS.RECORDING
           }
-        />
-        <div class="circle" style={{display: (recordWebcam.status === CAMERA_STATUS.RECORDING)?'block':'none'}}>
+        >
+          <canvas ref={canvasRef} />
+          <div
+            className="circle"
+            style={{
+              display:
+                recordWebcam.status === CAMERA_STATUS.RECORDING
+                  ? "block"
+                  : "none",
+            }}
+          />
         </div>
       </div>
 
-      <div className="colC">
-
-      <h1 >{wordList[index]}</h1>
-      <h2>{progress}/{level*2} words signed</h2>
       <Control
         setIndex={setIndex}
         progress={progress}
@@ -153,8 +151,6 @@ export default function MainScreen({
         word={word}
         recordWebcam={recordWebcam}
       />
-    </div>
-
     </div>
   );
 }

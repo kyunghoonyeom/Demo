@@ -1,5 +1,7 @@
 import data from "../assets/wordsToSign.json";
 import { CAMERA_STATUS } from "react-record-webcam";
+import "./Control.css";
+
 export default function Control({
   level,
   setLevel,
@@ -47,24 +49,24 @@ export default function Control({
   };
 
   return (
-    <div>
+    <div className="control-cta">
       <button
         hidden={recordWebcam.status !== CAMERA_STATUS.OPEN}
         onClick={recordWebcam.start}
       >
-        START RECORDING
+        start recording
       </button>
       <button
         hidden={recordWebcam.status !== CAMERA_STATUS.RECORDING}
         onClick={handleStop}
       >
-        STOP RECORDING
+        stop recording
       </button>
       <button
         hidden={recordWebcam.status !== CAMERA_STATUS.PREVIEW}
         onClick={handleDownload}
       >
-        DOWNLOAD DATA
+        download data
       </button>
     </div>
   );

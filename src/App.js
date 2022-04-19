@@ -11,7 +11,12 @@ export default function App() {
 
   return (
     <div className="App">
-      <div>
+      <Prompt
+        level={level}
+        setWord={setWord}
+        progress={progress}
+        index={index}
+      />
       <MainScreen
         word={word}
         setIndex={setIndex}
@@ -19,11 +24,7 @@ export default function App() {
         setProgress={setProgress}
         level={level}
         setLevel={setLevel}
-        setWord={setWord}
-        index={index}
       />
-      </div>
-
     </div>
   );
 }
